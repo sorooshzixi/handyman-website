@@ -36,7 +36,7 @@
             <div class="flex items-center">
                 <!-- <i class="fas fa-tools text-3xl text-blue-600 mr-3"></i> -->
                 <img src="logo.jpg" alt="Taskforce Handyman Services Logo" class="h-10 mr-3">
-                <h1 class="text-2xl font-bold text-gray-800">Taskforce<span class="text-blue-600">Handyman</span>Services</h1>
+                <h1 class="text-2xl font-bold text-gray-800 ext-ellipsis overflow-hidden whitespace-nowrap">Taskforce<span class="text-blue-600">Handyman</span>Services</h1>
             </div>
             <nav class="hidden md:flex space-x-8">
                 <a href="#services" class="text-gray-700 hover:text-blue-600 font-medium">Services</a>
@@ -322,7 +322,7 @@
                             </div>
                             <div class="flex items-center">
                                 <i class="fas fa-map-marker-alt mr-4 text-xl"></i>
-                                <span class="text-lg">Serving Houston, TX and surrounding areas</span>
+                                <span class="text-lg">Houston, TX</span>
                             </div>
                         </div>
                         
@@ -352,22 +352,25 @@
                     
                     <div class="md:w-1/2 p-8 md:p-12">
                         <h3 class="text-2xl font-bold text-gray-800 mb-6">Get a Free Quote</h3>
-                        <form>
+                        <form id="offerForm" class="space-y-4" action="https://formsubmit.co/tf.handyman.services@gmail.com" method="POST" name="offerForm">
+                            <input type="hidden" name="_captcha" value="false">
+                            <!-- display a form submission success message popup -->
+                            <input type="hidden" name="_next" value="javascript:void(0);">
                             <div class="mb-4">
                                 <label for="name" class="block text-gray-700 font-medium mb-2">Name</label>
-                                <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div class="mb-4">
                                 <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
-                                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div class="mb-4">
                                 <label for="phone" class="block text-gray-700 font-medium mb-2">Phone</label>
-                                <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div class="mb-4">
                                 <label for="service" class="block text-gray-700 font-medium mb-2">Service Needed</label>
-                                <select id="service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <select id="service" name="service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="">Select a service</option>
                                     <option value="carpentry">Carpentry</option>
                                     <option value="drywall">Drywall</option>
@@ -390,6 +393,15 @@
             </div>
         </div>
     </section>
+
+    <div id="thankyouPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+          <h2 class="text-2xl font-bold mb-4">Thank you!</h2>
+          <p>Your form has been submitted.</p>
+          <button onclick="closePopup()" class="mt-6 bg-blue-600 text-white py-2 px-4 rounded">Close</button>
+        </div>
+      </div>
+      
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
@@ -460,15 +472,15 @@
         document.getElementById('save-contact').addEventListener('click', function() {
             // Create a vCard
             const vCard = `BEGIN:VCARD
-VERSION:3.0
-FN:Taskforce Handyman Services
-ORG:Taskforce Handyman Services
-TEL;TYPE=work,voice:(210) 870-8537
-EMAIL;TYPE=internet,pref:josephhknoll@gmail.com
-URL:https://www.houstonhandymanpro.com
-ADR;TYPE=work:;;Houston;TX;;USA
-NOTE:24/7 Handyman Services in Houston
-END:VCARD`;
+                            VERSION:3.0
+                            FN:Taskforce Handyman Services
+                            ORG:Taskforce Handyman Services
+                            TEL;TYPE=work,voice:(210) 870-8537
+                            EMAIL;TYPE=internet,pref:josephhknoll@gmail.com
+                            URL:https://www.houstonhandymanpro.com
+                            ADR;TYPE=work:;;Houston;TX;;USA
+                            NOTE:24/7 Handyman Services in Houston
+                            END:VCARD`;
             
             // Create blob and download link
             const blob = new Blob([vCard], { type: 'text/vcard' });
@@ -510,6 +522,33 @@ END:VCARD`;
                 }
             });
         });
+    
+        document.getElementById("offerForm").addEventListener("submit", function(e) {
+            e.preventDefault(); // prevent default form submission
+        
+            const form = e.target;
+            
+            // Submit the form using fetch (async request)
+            fetch(form.action, {
+                method: "POST",
+                body: new FormData(form)
+            }).then(response => {
+                if (response.ok) {
+                    // Show the popup
+                    document.getElementById("thankyouPopup").classList.remove("hidden");
+                    form.reset(); // optional: reset the form
+                } else {
+                    alert("There was an issue submitting the form.");
+                }
+            }).catch(() => {
+                alert("There was an error. Please try again later.");
+            });
+        });
+        
+        function closePopup() {
+            document.getElementById("thankyouPopup").classList.add("hidden");
+        }
+    
     </script>
 </body>
 </html>
